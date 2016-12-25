@@ -1,0 +1,194 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Kysely v1.0 - Edit</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="style_edit.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+</head>
+<body>
+
+    <header>
+        <div id="nav"><a href="../">Show Questionnaire</a><a href="../edit/" class="active">Edit Questionnaire</a> <a href="report.html">Report</a></div>
+    </header>
+    <div class="container-fluid">
+        <h4>Edit your Questions:</h4>
+            <form class="form" name="new-question">
+                <div class="col-sm-8">
+                        <input type="text" class="form-control" name="text" placeholder="Type your question here">
+                </div>
+                <div class="col-sm-4">
+                        <input type="submit" id="sendQuestion" class="btn btn-info btn-sm" value="Add to your Questionnaire">
+                </div>
+            </form>
+
+        <div>
+            <table id="existing-questions">
+                </table>
+         </div>
+
+        <div id="popover-content">
+            <p>Are you sure you want to delete that question?</p><input type="button" class="btn btn-danger" value="Delete"> <input type="button" class="btn btn-default" value="Cancel">
+        </div>
+
+        <div id="deploy-buttons">
+            <input type="button" class="btn btn-primary btn-md" id="deploy" value="Publish Questionnaire">
+        </div>
+    </div>
+
+    <script type="text/javascript">
+    var questionNumber = 1; //juokseva kysymysten numerointi
+         $(document).ready(function () {
+
+            // Olemassa olevien kysymysten tulostaminen
+              getQuestions();
+
+
+            //Uuden kysymyksen lisääminen TOIMII 5.12.
+            $( "form" ).submit(function( event ) {
+                event.preventDefault();
+                var newQuestion = $( this ).serializeArray();
+                var json = {"questionnaireId":1};
+                $.each(newQuestion, function() {
+                    json[this.name] = this.value || '';
+                });
+                console.log(json);
+
+                $('input[name="text"]').val('');
+
+                //Postataan data
+                var postData =  $.ajax({
+                                        url: 'http://proto432.haaga-helia.fi:8080/notet/questionnaire/question/',
+                                        type: 'POST',
+                                        data: JSON.stringify(json),
+                                        contentType: "application/json; charset=utf-8",
+                                        dataType: "json"
+                                    });
+
+                postData.fail(function() {
+                    alert("Oops! Something went veeery wrong! Try again.");
+                });
+
+                //Haetaan uudelleen kysymyslista
+                postData.done(function() {
+                                    alert("Done!");
+                                    questionNumber = 1;
+                                    $( "#existing-questions" ).empty();
+                                    getQuestions();
+                            });
+
+            });
+
+        });
+
+        function getQuestions() {
+            $.getJSON( "http://proto432.haaga-helia.fi:8080/notet/questionnaire/1/", function( data ) {
+                                    $.each(data.questions, function(key, value) {
+                                        if (value.deleted === true) {
+                                            //ei luetella deletoituja kysymyksiä
+                                                } else {
+                                                        var kysymys = $("<tr/>").appendTo("#existing-questions");
+                                                        //Kysymysnumero + kysymysteksti
+                                                        $("<td><p>" + questionNumber + ".</p></td> <td id=" + value.id + "><p>" + value.text + "</p></td>").appendTo(kysymys);
+                                                        //Muokkaus + poistonappi
+                                                        $("<td><a href='#' onClick='editQuestion(" + value.id + ")'><span class='glyphicon glyphicon-pencil'></span></a> <a href='#' onClick='removePopup("+value.id+")' class='popover-remove-"+ value.id +"'><span class='glyphicon glyphicon-remove'></span></a> </td>").appendTo(kysymys);
+                                                        questionNumber++;
+                                                    }
+                                     });
+                                    });
+        }
+
+        //Poistoruksin popup TOIMII 5.12.
+        function removePopup(questionId) {
+                        var popupContent = ("<p>Are you sure you want to delete that question?</p><input type='button' class='btn btn-danger' onClick='removeQuestion("+ questionId +")' value='Delete'> <input type='button' class='btn btn-default' value='Cancel'>");
+                        $('.popover-remove-' + questionId).popover({
+                            placement: 'bottom',
+                            trigger: 'focus',
+                            html: true,
+                            content: function () {
+                                return popupContent;
+                            }
+                        });
+
+                        $('.popover-remove-' + questionId).popover("show");
+
+        };
+
+        // Kysymyksen poistaminen TOIMII 5.12.
+            function removeQuestion(questionId) {
+
+                var json = {"id": questionId, "deleted":true};
+
+                var postData =  $.ajax({
+                                            url: 'http://proto432.haaga-helia.fi:8080/notet/questionnaire/question/',
+                                            type: 'POST',
+                                            data: JSON.stringify(json),
+                                            contentType: "application/json; charset=utf-8",
+                                            dataType: "json"
+                                        });
+
+                    postData.fail(function() {
+                        alert("Oops! Something went veeery wrong! Try again.");
+                    });
+
+                    //Päivitetään kysymyslista
+                    postData.done(function() {
+                                    alert("Done!");
+                                    questionNumber = 1;
+                                    $( "#existing-questions" ).empty();
+                                    getQuestions();
+                            });
+            };
+
+
+
+        //Kysymyksen muokkaaminen TOIMII 5.12
+            function editQuestion(questionId) {
+                event.preventDefault();
+                var element = document.getElementById(questionId);
+                var kysymysteksti = element.textContent;
+                element.innerHTML = ("<form id='edit-question' class='form-inline'><input type='text' class='form-control input-md edit-input' name='text' value=" + JSON.stringify(kysymysteksti) + "><input type='submit' id='editQuestion' class='btn btn-default btn-sm' value='Save'><input type='button' id='edit-cancel' class='btn btn-default btn-sm' value='Cancel'>");
+
+                $("#edit-cancel").click(function() {
+                    element.innerHTML = kysymysteksti;
+                });
+
+                $("#edit-question").submit(function (event) {
+                    event.preventDefault();
+                    var newQuestion = $( this ).serializeArray();
+                    var json = {"id":questionId};
+                    $.each(newQuestion, function() {
+                        json[this.name] = this.value || '';
+                    });
+
+                    //postataan data
+                    var postData =  $.ajax({
+                                            url: 'http://proto432.haaga-helia.fi:8080/notet/questionnaire/question/',
+                                            type: 'POST',
+                                            data: JSON.stringify(json),
+                                            contentType: "application/json; charset=utf-8",
+                                            dataType: "json"
+                                        });
+
+                    postData.fail(function() {
+                        alert("Oops! Something went veeery wrong! Try again.");
+                    });
+
+                    //päivitetään uusi kysymys listaan
+                    postData.done(function(data) {
+                                    alert("Done!");
+                                    questionNumber = 1;
+                                    $( "#existing-questions" ).empty();
+                                    getQuestions();
+                    });
+                });
+             };
+
+
+
+</script>
+</body>
+</html>

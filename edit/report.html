@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Kysely v1.0 - Report</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="style_report.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+</head>
+<body>
+
+    <header>
+        <div id="nav"><a href="../">Show Questionnaire</a><a href="../edit/" >Edit Questionnaire</a> <a href="report.html" class="active">Report</a></div>
+    </header>
+    <div class="container-fluid">
+
+        <h2>Report on your Questionnaire</h2>
+
+            
+
+    </div>
+
+    
+     
+<script type="text/javascript">
+     $(document).ready(function () {
+            
+         $.getJSON( "http://proto432.haaga-helia.fi:8080/notet/questionnaire/1/", function( data ) {
+                                    $.each(data.questions, function(key, value) {
+                                        if (value.deleted === true) {
+                                            //ei luetella deletoituja kysymyksiä
+                                                } else {
+                                                        var kysymys = $("<table class=existing-questions />").appendTo(".container-fluid");
+                                                    
+                                                        var excellentCount = 0;
+                                                        var goodCount = 0;
+                                                        var smtFixCount = 0;
+                                                        var badCount = 0;
+                                                        var totalCount = 0;
+
+                                                        $.each(this.answers, function(key,value){
+                                                                switch(this.choice) {
+                                                                            case (1):
+                                                                                badCount++;
+                                                                                totalCount++;
+                                                                                break;
+                                                                            case (2):
+                                                                                smtFixCount++;
+                                                                                totalCount++;
+                                                                                break;
+                                                                            case (3):
+                                                                                goodCount++;
+                                                                                totalCount++;
+                                                                                break;
+                                                                            case (4):
+                                                                                excellentCount++;
+                                                                                totalCount++;
+                                                                                break;
+                                                                        }
+                                                        });
+
+                                                        $("<tr><th style='width:80%'><p>" + value.text + "</p></th><th style='width:20%'> Total: " + totalCount + "</th></tr>").appendTo(kysymys);
+                                                        $("<tr><td>Excellent</td><td>" + excellentCount + "</td></tr><tr><td>Good</td><td>" + goodCount + "</td></tr><tr><td>Something to fix</td><td>" + smtFixCount + "</td></tr><tr><td>Bad</td><td>" +  badCount +"</td></tr>").appendTo(kysymys);
+                                                    }
+                                     });
+                     });
+
+     });
+
+     
+</script>
+</body>
+</html>

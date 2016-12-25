@@ -1,0 +1,87 @@
+.container-fluid {
+    width:40%;
+    margin-left:30%;
+    margin-right:30%;
+    text-align: left;
+}
+
+.form {
+    display:flex;
+    padding-top:5%;
+}
+
+#existing-questions {
+    margin-left:10%;
+    margin-right:10%;
+    margin-top:3%;
+    width:80%;
+
+}
+
+tr {
+    height:20px;
+}
+
+td {
+    font-size: 19px;
+    padding-top:5%;
+    height: 10%;
+}
+
+td form {
+    margin:0;
+    width: 100%;
+    display: inline-block;
+}
+
+td a {
+    padding:5px;
+}
+
+#popover-content {
+    display: none;
+}
+
+.glyphicon-remove:hover {
+    color:crimson;
+}
+
+.glyphicon-pencil:hover {
+    color:darkblue;
+}
+
+.edit-buttons {
+    display: inline-flex;
+}
+
+#deploy-buttons {
+    margin:5%;
+    margin-bottom:10%;
+    text-align: center;
+}
+header {
+    height:90px;
+    width:100%;
+    background-color:#46b8da;
+    text-align: center;
+    padding:2%;
+    margin-bottom:5%;
+}
+
+#links {
+    margin-left:10%;
+    margin-bottom:10%;
+    width: 80%;
+}
+
+header a {
+    background-color: darkgray;
+    border:1.5px solid;
+    padding:1%;
+    margin:5%;
+    color:darkslategrey;
+}
+
+header a.active {
+    background-color: lightgrey;
+}

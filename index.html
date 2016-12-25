@@ -1,0 +1,119 @@
+<!doctype html>
+<html>
+   <head>
+      <meta charset="UTF-8">
+      <title>Kysely v1.0</title>
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+      <link rel="stylesheet" type="text/css" href="style.css">
+      <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <script type = "text/javascript" src = "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+       <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-86715488-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+   </head>
+   <body>
+       <header>
+          </header>
+      <div class="container">
+         <h1>How are you today?</h1>
+         <form id="questionnaire">
+             <div id="get-kysymys">
+             </div>
+            <!-- Template-vastausvaihtoehdot -->
+             <div id="question" class="hidden">
+               <div class="hymyt">
+                  <label><input type="radio" name="null" value="4" /><img src="uudethymiot/erinomainen.png" alt="Excellent" height="148" width="145"><span>Excellent</span></label>
+                  <label><input type="radio" name="null" value="3"  /><img src="uudethymiot/hyva.png" alt="Good" height="148" width="145"><span>Good</span></label>
+                  <label><input type="radio" name="null" value="2" /><img src="uudethymiot/korjattavaa.png" alt="Something to fix" height="148" width="145"><span>Something to fix</span></label>
+                  <label><input type="radio" name="null" value="1"/><img src="uudethymiot/huono.png" alt="Bad" height="148" width="145"><span>Bad</span></label>
+               </div>
+             </div>
+
+             <div id="openText" class="hidden">
+                 <input type="text" name="null">
+             </div>
+                    <input type="submit" class="btn btn-primary" value="Lähetä">
+                    <div id="success"></div>
+         </form>
+      </div>
+       
+       
+       <div id="footer"><a href="edit/">Edit Questionnaire</a></div>
+
+
+      <script type="text/javascript">
+         $(document).ready(function () {
+              $.getJSON( "http://proto432.haaga-helia.fi:8080/notet/questionnaire/1/", function( data ) {
+                var questionNumber = 1;
+                   $.each(data.questions, function(key, value) {
+                       if (value.deleted === true) {
+
+                       } else {
+                            //Luodaan div kysymykselle
+                            var kysymys = $("<div class='question'/>").appendTo("#get-kysymys");
+
+                            //Kysymysnumero + kysymysteksti
+                            $("<h2/>").text(questionNumber + ". " + value.text).appendTo(kysymys);
+
+                            //Vastausvaihtoehdot
+                            var template = $('#question div').clone();
+                            $(template).find('input:radio').attr('name', value.id);
+                            $(template).find("label").on('click', goToNextQuestion);
+                            $(template).appendTo(kysymys);
+
+                            questionNumber++;
+                     };
+                 });
+		     });
+
+             // Scroll-efekti
+            function goToNextQuestion(event) {
+                console.log($(event.target));
+                // ettii painetun napin parentin seuraavan sisaruksen jolla on luokka question
+                var nextSibling = $(event.target).closest('.question').next('.question');
+                // hakee sen seuraavan sisaruksen etäisyyden sivun ylälaidast
+                var offsetTop = nextSibling.offset().top;
+                // animoi liikkumisen tohon etäisyytee
+                $('html, body').animate({ scrollTop: offsetTop }, 700);
+             }
+         });
+
+         //Vastausten lähettäminen MUOKATTU 8.12 - TOIMII
+         $( "form" ).submit(function( event ) {
+             event.preventDefault();
+             var answers = $("#questionnaire").serializeArray();
+              $.each(answers, function() {
+                  if (this.name=="null") {
+
+                  } else {
+                    var tempjson = {"type":"NUMBER", "choice":this.value, "questionId":this.name};
+                    var postData =  $.ajax({
+                                        url: 'http://proto432.haaga-helia.fi:8080/notet/answers/',
+                                        type: 'POST',
+                                        data: JSON.stringify(tempjson),
+                                        contentType: "application/json; charset=utf-8",
+                                        dataType: "json"
+                                    });
+
+
+                  }
+
+
+                });
+
+                document.getElementById("success").innerHTML = "<div class='alert alert-success'>Thank you for your response!</div>";
+
+         });
+
+      </script>
+   </body>
+</html>

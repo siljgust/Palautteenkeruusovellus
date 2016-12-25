@@ -1,0 +1,133 @@
+/*Kysely v1.0*/
+
+body {
+    margin:0;
+    top:0;
+    font-family: 'Open Sans', sans-serif;
+    background-color: #FCFCFC;
+    text-align: center;
+}
+
+.container {
+    text-align: center;
+
+}
+
+header {
+    background-image: url(KyselyTausta9.jpg);
+    background-size: cover;
+    height:150px;
+    
+}
+
+h1 {
+    padding-top:10%;
+}
+
+h2 {
+    padding-top:15%;
+    padding-bottom:8%;
+    font-size: 19px;
+    font-weight: bold;
+}
+
+h3 {
+    padding-top:5%;
+}
+
+
+div  {
+    padding:2px;
+}
+
+.hidden {
+    display: none;
+}
+
+.hymyt {
+    padding:0;
+    display: inline-flex;
+    white-space:nowrap;
+}
+
+.hymyt label {
+    min-width:20%;
+}
+
+.hymyt label span
+{
+    display: block;
+    width: 100%;
+    padding: 5%;
+}
+
+.question {
+    max-width: 100%;
+}
+
+img {
+    max-width: 80%;
+    height:auto;
+    padding:10%;
+}
+
+label > input {
+    display: none;
+    border: 2px solid transparent;
+    border-radius: 20px;
+}
+
+
+label > input + img {
+    cursor: pointer;
+    border: 1.5px solid #46b8da;
+    border-radius: 20px;
+    background-color: #FAF9F5;
+}
+
+label:hover > input + img {
+    cursor: pointer;
+    border: 1.5px solid #46b8da;
+    border-radius: 20px;
+    background-color: #F0EDE6;
+}
+
+label > input:checked + img {
+    border:1.5px solid #46b8da;
+    background-color: #EBE8E1;
+}
+
+.btn-primary {
+    width: 40%;
+    font-size: 17px;
+    margin-top:10%;
+}
+
+#success {
+    margin-top:2%;
+    margin-bottom:30%;
+    margin-left: 30%;
+    margin-right: 30%;
+    width:40%;
+}
+
+
+#footer {
+    text-align: right;
+    position:fixed;
+    left:0px;
+    bottom:0px;
+    width:100%;
+    height:10px;
+    padding:2%;
+}
+
+#footer a {
+    color: whitesmoke;
+    text-decoration:none;
+}
+
+#footer a:hover {
+    color:lightgray;
+    text-decoration:none;
+}
